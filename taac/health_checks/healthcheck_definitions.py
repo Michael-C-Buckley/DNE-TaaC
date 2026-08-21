@@ -15,6 +15,10 @@ from the gate-test allowlist.
 import json
 import typing as t
 
+from taac.utils.characterization import (
+    CPU_SUMMARY_JQ_VAR,
+    RSS_SUMMARY_JQ_VAR,
+)
 from taac.utils.json_thrift_utils import thrift_to_json
 from taac.health_check.health_check import types as hc_types
 from taac.test_as_a_config.types import (
@@ -1961,7 +1965,12 @@ def create_service_restart_check(
 
 
 def create_cpu_percentile_observe_check(
-    summary_jq_var: str = "cpu_percentile_summary",
+    # Defaulted only so this factory stays introspectable by the
+    # factory-coverage and snapshot tests, which exercise every factory that
+    # takes no required argument. The base name is NOT what a real bracket
+    # writes: every caller passes the span-qualified name from
+    # characterization_summary_jq_var().
+    summary_jq_var: str = CPU_SUMMARY_JQ_VAR,
     gate_percentile: float = 95.0,
     gate_threshold_pct: t.Optional[float] = None,
     check_scope: t.Optional["hc_types.Scope"] = None,
@@ -1992,7 +2001,9 @@ def create_cpu_percentile_observe_check(
 
 
 def create_rss_delta_observe_check(
-    summary_jq_var: str = "rss_delta_summary",
+    # Defaulted for factory introspection only; see
+    # create_cpu_percentile_observe_check above.
+    summary_jq_var: str = RSS_SUMMARY_JQ_VAR,
     max_growth_pct: t.Optional[float] = None,
     check_scope: t.Optional["hc_types.Scope"] = None,
 ) -> PointInTimeHealthCheck:

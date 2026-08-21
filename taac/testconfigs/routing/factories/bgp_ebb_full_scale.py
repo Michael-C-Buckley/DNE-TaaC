@@ -84,6 +84,7 @@ from taac.testconfigs.routing.util.bgp_ebb_health_checks import (
 from taac.testconfigs.routing.util.bgp_ebb_setup_tasks import (
     build_expected_peer_identity,
 )
+from taac.utils.characterization import OBSERVE_ONLY
 from taac.test_as_a_config.types import (
     Playbook,
     PointInTimeHealthCheck,
@@ -684,6 +685,7 @@ def _get_bgp_ebb_full_scale_playbooks(
             peergroup_ibgp_v4=PEERGROUP_IBGP_V4,
             total_session_count=session_count,
             profile=profile,
+            characterization=OBSERVE_ONLY,
         ),
         get_bgp_ebb_route_storm_playbook(
             device_name=device_name,
@@ -696,6 +698,7 @@ def _get_bgp_ebb_full_scale_playbooks(
             cycles=route_storm_cycles,
             quiet_window_seconds=route_storm_quiet_window_seconds,
             bounded_validation=route_storm_bounded_validation,
+            characterization=OBSERVE_ONLY,
         ),
         get_bgp_ebb_route_registry_runtime_update_playbook(
             device_name=device_name,
@@ -713,6 +716,7 @@ def _get_bgp_ebb_full_scale_playbooks(
             test_duration_seconds=multipath_test_duration_seconds,
             oscillation_interval_seconds=multipath_oscillation_interval_seconds,
             cycle_count=multipath_cycle_count,
+            characterization=OBSERVE_ONLY,
         ),
         get_bgp_ebb_igp_pnh_metric_oscillation_playbook(
             device_name=device_name,
@@ -723,6 +727,7 @@ def _get_bgp_ebb_full_scale_playbooks(
             expected_established_sessions=session_count,
             profile=profile,
             expected_peer_identity=expected_peer_identity,
+            characterization=OBSERVE_ONLY,
         ),
         get_bgp_ebb_fauu_drain_undrain_playbook(
             device_name=device_name,
@@ -747,6 +752,7 @@ def _get_bgp_ebb_full_scale_playbooks(
         get_bgp_ebb_longevity_playbook(
             device_name=device_name,
             duration=_LONGEVITY_DURATION_SECONDS,
+            characterization=OBSERVE_ONLY,
         ),
         get_bgp_ebb_daemon_restart_playbook(
             device_name=device_name,
@@ -756,6 +762,7 @@ def _get_bgp_ebb_full_scale_playbooks(
             profile=profile,
             expected_peer_identity=expected_peer_identity,
             parent_prefixes_to_ignore=[bgp_mon_parent_prefix],
+            characterization=OBSERVE_ONLY,
         ),
         get_bgp_ebb_cold_start_playbook(
             device_name=device_name,
@@ -784,6 +791,7 @@ def _get_bgp_ebb_full_scale_playbooks(
             expected_established_sessions=session_count,
             profile=profile,
             parent_prefixes_to_ignore=[bgp_mon_parent_prefix],
+            characterization=OBSERVE_ONLY,
         ),
         get_bgp_ebb_ibgp_plane_session_oscillation_playbook(
             device_name=device_name,
@@ -804,6 +812,7 @@ def _get_bgp_ebb_full_scale_playbooks(
             profile=profile,
             expected_peer_identity=expected_peer_identity,
             parent_prefixes_to_ignore=[bgp_mon_parent_prefix],
+            characterization=OBSERVE_ONLY,
         ),
         get_bgp_ebb_igp_unresolvable_pnh_playbook(
             device_name=device_name,
@@ -811,9 +820,11 @@ def _get_bgp_ebb_full_scale_playbooks(
             peergroup_ibgp_v4=PEERGROUP_IBGP_V4,
             local_link=local_link,
             other_link=other_link,
-            expected_established_sessions=session_count,
+            expected_in_scope_sessions=session_count,
             profile=profile,
             expected_peer_identity=expected_peer_identity,
+            bgp_mon_parent_network=bound_bgp_mon_network,
+            characterization=OBSERVE_ONLY,
         ),
         get_bgp_ebb_nexthop_group_count_threshold_playbook(
             device_name=device_name,

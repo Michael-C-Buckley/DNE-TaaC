@@ -182,7 +182,7 @@ class CpuCharacterizationConfig:
     results table); set it to gate on the raw ``gate_percentile``.
     """
 
-    summary_jq_var: str = "cpu_percentile_summary"
+    summary_jq_var: str
     gate_percentile: float = 95.0
     gate_threshold_pct: t.Optional[float] = None
 
@@ -197,7 +197,7 @@ class RssDeltaConfig:
     set it to gate on steady-state RSS growth over the in-run baseline.
     """
 
-    summary_jq_var: str = "rss_delta_summary"
+    summary_jq_var: str
     max_growth_pct: t.Optional[float] = None
 
 
@@ -316,13 +316,25 @@ def _daemon_restart(ctx: ProfileContext) -> ProfileChecks:
     )
 
 
-def _append_characterization_postchecks(
-    postchecks: t.List[PointInTimeHealthCheck], ctx: ProfileContext
+def _characterization_postchecks(
+    ctx: ProfileContext,
 ) -> t.List[PointInTimeHealthCheck]:
-    """Append the opt-in observe-only characterization postchecks (RSS delta,
-    CPU percentile) when configured on the context. Both land in the results
-    table; observe-only unless their config carries a threshold.
+    """Build the opt-in observe-only characterization postchecks (RSS delta,
+    CPU percentile) configured on the context. Both land in the results table;
+    observe-only unless their config carries a threshold.
+
+    Returns a new list rather than appending to a caller-supplied one, so
+    correctness does not depend on every profile builder handing back a freshly
+    constructed postcheck list. Empty when neither config is set.
+
+    Args:
+        ctx: Per-invocation context carrying the optional characterization
+            configs.
+
+    Returns:
+        Zero, one, or two postchecks, in RSS-then-CPU order.
     """
+    postchecks: t.List[PointInTimeHealthCheck] = []
     if ctx.rss_delta is not None:
         postchecks.append(
             create_rss_delta_observe_check(
@@ -354,21 +366,18 @@ def _cold_start(ctx: ProfileContext) -> ProfileChecks:
             check_ibgp_pnh=ctx.check_ibgp_pnh,
             bgp_mon=ctx.bgp_mon,
         ),
-        postchecks=_append_characterization_postchecks(
-            create_standard_postchecks(
-                postcheck_thresholds=ctx.postcheck_thresholds,
-                convergence_hard_timeout_seconds=(
-                    _LIFECYCLE_CONVERGENCE_HARD_TIMEOUT_SECONDS
-                ),
-                fail_on_eor_expired=ctx.fail_on_eor_expired,
-                expected_established_session_count=(
-                    ctx.expected_established_sessions or None
-                ),
-                expected_restarted_services=["Bgp"],
-                restart_start_time_jq_var="daemon_restart_time",
-                bgp_mon=ctx.bgp_mon,
+        postchecks=create_standard_postchecks(
+            postcheck_thresholds=ctx.postcheck_thresholds,
+            convergence_hard_timeout_seconds=(
+                _LIFECYCLE_CONVERGENCE_HARD_TIMEOUT_SECONDS
             ),
-            ctx,
+            fail_on_eor_expired=ctx.fail_on_eor_expired,
+            expected_established_session_count=(
+                ctx.expected_established_sessions or None
+            ),
+            expected_restarted_services=["Bgp"],
+            restart_start_time_jq_var="daemon_restart_time",
+            bgp_mon=ctx.bgp_mon,
         ),
         snapshot_checks=create_standard_snapshot_checks(
             expected_peer_identity=ctx.expected_peer_identity,
@@ -846,4 +855,18 @@ def get_profile_checks(profile: CheckProfile, ctx: ProfileContext) -> ProfileChe
     builder = _PROFILE_BUILDERS.get(profile)
     if builder is None:
         raise ValueError(f"Unknown CheckProfile: {profile}")
-    return builder(ctx)
+    checks = builder(ctx)
+    # Characterization reporting is profile-independent. Any playbook that
+    # brackets a span (see create_characterization_bracket_stages) sets these
+    # configs on the context, and the matching postcheck is added here rather
+    # than in each of the 20+ profile builders. Without it the bracket would
+    # collect a measurement and stash it into a jq var that nothing reads.
+    # No-op when neither config is set, which is every playbook that has not
+    # opted in.
+    characterization = _characterization_postchecks(ctx)
+    if not characterization:
+        return checks
+    # Rebuild rather than append: a builder is free to return a shared or
+    # cached list, and mutating it would leak these postchecks into every later
+    # caller of that profile.
+    return checks._replace(postchecks=[*checks.postchecks, *characterization])
