@@ -1,0 +1,135 @@
+{
+  "nodes": {
+    "fboss-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1780512791,
+        "narHash": "sha256-oBPYNcuf0v48GwI3aZyDGXOjNTRZcDN37Zkpc/V8eQs=",
+        "owner": "facebook",
+        "repo": "fboss",
+        "rev": "a61b92c23e6e8a97db2ff58006d34f0224434da6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "facebook",
+        "repo": "fboss",
+        "rev": "a61b92c23e6e8a97db2ff58006d34f0224434da6",
+        "type": "github"
+      }
+    },
+    "fbthrift-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785083590,
+        "narHash": "sha256-bzi4DRGOQy8HXLQa6roMY3CRqteoJxz2Xo6SsLfOdhY=",
+        "owner": "facebook",
+        "repo": "fbthrift",
+        "rev": "0215ea4e57004131f0eb7e092770f95659a15136",
+        "type": "github"
+      },
+      "original": {
+        "owner": "facebook",
+        "repo": "fbthrift",
+        "rev": "0215ea4e57004131f0eb7e092770f95659a15136",
+        "type": "github"
+      }
+    },
+    "fizz-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785083590,
+        "narHash": "sha256-zOTBC6G7mIVN/s56aUXEqs2FG2z/33jG/W5GUq4GwO0=",
+        "owner": "facebookincubator",
+        "repo": "fizz",
+        "rev": "ddb1b60503999c763fd31b18eb0d95faa62c6e3b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "facebookincubator",
+        "repo": "fizz",
+        "rev": "ddb1b60503999c763fd31b18eb0d95faa62c6e3b",
+        "type": "github"
+      }
+    },
+    "folly-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785162437,
+        "narHash": "sha256-xxS1FU3thl8UA1DzumVEazelISayLioabFjKlXX67Yk=",
+        "owner": "facebook",
+        "repo": "folly",
+        "rev": "3a38b74989093f7c61932212bc494376011f086c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "facebook",
+        "repo": "folly",
+        "rev": "3a38b74989093f7c61932212bc494376011f086c",
+        "type": "github"
+      }
+    },
+    "mvfst-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785083590,
+        "narHash": "sha256-H5T039YtYWP01UFtg7Y/7uGt9jhYEa7Q7j/9JhhSDfw=",
+        "owner": "facebook",
+        "repo": "mvfst",
+        "rev": "60f627255356ae51c8bc1bbd7f3c1e1a61480bcb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "facebook",
+        "repo": "mvfst",
+        "rev": "60f627255356ae51c8bc1bbd7f3c1e1a61480bcb",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1786599213,
+        "narHash": "sha256-yNJd40f11EzXBjSByCB7IPpeFFAdeoSKKM67dGkfFoU=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "0e251e24a4f24e036a084b6b4b2d2491af4167f4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "fboss-src": "fboss-src",
+        "fbthrift-src": "fbthrift-src",
+        "fizz-src": "fizz-src",
+        "folly-src": "folly-src",
+        "mvfst-src": "mvfst-src",
+        "nixpkgs": "nixpkgs",
+        "wangle-src": "wangle-src"
+      }
+    },
+    "wangle-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785083590,
+        "narHash": "sha256-BGl1LGaYRmYdG4h98HhAT7X4tXEMjlzh27nGLCY/B1c=",
+        "owner": "facebook",
+        "repo": "wangle",
+        "rev": "c0ab72eacf113dcb3cf57380a25ef554d4b8f8f6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "facebook",
+        "repo": "wangle",
+        "rev": "c0ab72eacf113dcb3cf57380a25ef554d4b8f8f6",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

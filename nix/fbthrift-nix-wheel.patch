@@ -1,0 +1,53 @@
+diff --git a/thrift/lib/python/CMakeLists.txt b/thrift/lib/python/CMakeLists.txt
+index 03dc0ab..41e288a 100644
+--- a/thrift/lib/python/CMakeLists.txt
++++ b/thrift/lib/python/CMakeLists.txt
+@@ -731,15 +731,12 @@ add_custom_command(TARGET thrift_python_and_py3_bindings
+   WORKING_DIRECTORY ${_cybld}
+ )
+ 
+-# Run auditwheel repair to make the wheel self-contained
+-# This bundles .so dependencies and rewrites RPATH to $ORIGIN
+-# LD_LIBRARY_PATH tells auditwheel where to find the libraries to bundle
++# Nix supplies the native dependency closure and fixes ELF RPATHs itself.
++# Keep the locally tagged wheel instead of asking auditwheel to claim a
++# manylinux ABI, which is invalid for the current Nix toolchain/glibc.
+ add_custom_command(TARGET thrift_python_and_py3_bindings
+-  COMMAND ${CMAKE_COMMAND} -E make_directory "${_cybld}/dist_self_contained"
+-  COMMAND ${CMAKE_COMMAND} -E env
+-    "LD_LIBRARY_PATH=${library_dirs_str}"
+-    ${Python3_EXECUTABLE} -m auditwheel repair
+-    --wheel-dir "${_cybld}/dist_self_contained"
+-    "${_cybld}/dist/*.whl"
++  COMMAND ${CMAKE_COMMAND} -E copy_directory
++    "${_cybld}/dist"
++    "${_cybld}/dist_self_contained"
+   WORKING_DIRECTORY ${_cybld}
+ )
+
+diff --git a/thrift/lib/python/test/CMakeLists.txt b/thrift/lib/python/test/CMakeLists.txt
+index 23bca54..f172459 100644
+--- a/thrift/lib/python/test/CMakeLists.txt
++++ b/thrift/lib/python/test/CMakeLists.txt
+@@ -14,8 +14,9 @@
+ 
+ # Generate thrift-python test types
+ 
+-# Signal to setup.py that test extensions should be built
+-set(THRIFT_BUILD_TESTS "1" PARENT_SCOPE)
++# The Nix package ships the runtime, not FBThrift's internal test extension
++# modules.  Their generated sources remain useful for upstream build targets.
++set(THRIFT_BUILD_TESTS "0" PARENT_SCOPE)
+ 
+ # Include ThriftLibrary macros
+ # (for standalone builds, CMAKE_MODULE_PATH must be set)
+@@ -795,7 +796,9 @@ string(CONCAT _pip_install_cmd
+   " --target '${_thrift_wheel_install_dir}'"
+   " '${_thrift_wheel_dir}'/thrift-0.0.1-*.whl")
+-add_custom_target(install_thrift_wheel ALL
++# This target exists only to prepare FBThrift's own test environment. Keep it
++# available to explicit test builds without adding it to the runtime build.
++add_custom_target(install_thrift_wheel
+   DEPENDS thrift_python_and_py3_bindings
+   COMMAND bash -c "${_pip_install_cmd}"
+   COMMAND ${Python3_EXECUTABLE} -m pip install

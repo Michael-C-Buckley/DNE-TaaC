@@ -4,6 +4,47 @@ Test As A Config (TAAC) — a configuration-driven network test automation frame
 
 A test is a `TestConfig` containing one or more **playbooks**; a playbook runs against a **DUT** (device under test) and is composed of ordered **stages**; each stage is a list of **steps** — the smallest units of work (e.g. `RUN_SSH_COMMAND_STEP`, `DUMMY_STEP`, plus device-management ones). Stages express ordering and parallelism; playbooks group what runs against which device.
 
+## Running with Nix
+
+On Linux with [Nix flakes enabled](https://nixos.wiki/wiki/Flakes), run the
+TAAC OSS command directly from the repository:
+
+```bash
+nix run . -- --help
+```
+
+The flake pins and builds the coordinated Folly, Fizz, Wangle, mvfst, and
+FBThrift snapshot used by this repository, generates the local and FBOSS
+Thrift Python bindings, and includes the Python dependencies from
+`requirements.txt`. No separately installed Python environment or Docker image
+is needed. The first cold build compiles that native dependency stack and can
+take a while; later runs use the Nix store.
+
+Run the included non-networking smoke configuration with:
+
+```bash
+nix run . -- \
+    --test-configs ./examples/live_smoke_config.py \
+    --dut fakedut123 \
+    --device-info-csv ./examples/topology/sample_device_info.csv \
+    --circuit-info-csv ./examples/topology/sample_circuit_info.csv \
+    --dry-run
+```
+
+For an editable checkout, enter the development environment. It provides
+`taac`, Python, pytest, the generated bindings, and `thrift1`, and places the
+checkout itself on `PYTHONPATH`:
+
+```bash
+nix develop
+pytest taac/runner/tests
+nix flake check
+```
+
+The flake currently supports `x86_64-linux` and `aarch64-linux`. Useful
+individual build outputs include `.#taac`, `.#thrift-bindings`, and
+`.#fbthrift-python-runtime`.
+
 
 ## Quick start
 

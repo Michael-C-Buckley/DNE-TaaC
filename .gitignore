@@ -5,3 +5,7 @@ build/
 # getdeps scratch / CMake build output
 __pycache__/
 *.pyc
+
+# Nix build result symlinks
+result
+result-*
